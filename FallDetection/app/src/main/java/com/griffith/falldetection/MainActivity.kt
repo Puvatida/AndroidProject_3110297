@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 //import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.runtime.Composable
+import androidx.compose.material3.Divider
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,6 +15,14 @@ class MainActivity : ComponentActivity() {
 //        enableEdgeToEdge()
         setContent {
             Text("Set up");
+
+            emergButton()
             }
-        }
+        }//set content
     }
+@Composable
+fun emergButton(){
+    Button(onClick = {}){
+        Text("Emergency")
+    }
+}
