@@ -4,17 +4,19 @@ package com.griffith.falldetection
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShareLocation
 //import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
@@ -22,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,9 +33,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-
 
 
 class MainActivity : ComponentActivity() {
@@ -41,11 +44,117 @@ class MainActivity : ComponentActivity() {
 //        enableEdgeToEdge()
         setContent {
             Text("Set up")
-            HomeScreen()
+            StartScreen()
+//            Login()
+//            HomeScreen()
             }
         }//set content
     }
+private var email = mutableStateOf("enter email")
+private var password = mutableStateOf("enter password")
+@Composable
+fun StartScreen(){
+    //create a mutable value to track which screen to show based on user's click
+    var view by remember { mutableStateOf("start") }
 
+    when(view) {
+        "start" -> WelcomeScreen(//check for the button that was clicked
+            registerClick = { view = "register" },
+            loginClick = { view = "login" }
+        )
+        //directing user to welcome screen
+        "register" -> RegisterScreen(goBack = {view = "start"}) //to start if user wishes
+        "login" -> LoginScreen(goBack = {view = "start"})
+    }
+}
+@Composable //with button parameters onClick()
+fun WelcomeScreen(registerClick: () -> Unit, loginClick: () -> Unit) { //First screen user sees
+
+    //add column to space out everything and add spacers
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+//            .padding(innerPadding),
+    ) {
+        //creating big user icon
+        Icon(
+            imageVector = Icons.Default.AccountCircle,//vector image of default user icon
+            contentDescription = "User Icon",
+            modifier = Modifier.size(150.dp).padding(bottom = 32.dp) //padding and size
+//        tint = TODO()
+        )
+        //welcome text
+        Text(
+            text = "Welcome"
+
+        )
+        Spacer(modifier = Modifier.size(40.dp))
+        //ask user to login or register button
+        Button(onClick = registerClick){
+            Text("Register")
+        }
+        Spacer(modifier = Modifier.size(10.dp))
+        Button(onClick = loginClick) {
+            Text("Login")
+        }
+    }
+}//Welcome Screen
+@Composable
+fun LoginScreen(goBack: () -> Unit) {
+    Text("LOGIN SCREEN")
+    Column ( //center and set size
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize().padding(30.dp)
+    ){
+        TextField(
+            value = email.value,
+            onValueChange = {email.value = it}
+        )
+        Spacer(modifier = Modifier.size(10.dp))
+        TextField(
+            value = password.value,
+            onValueChange = {password.value = it}
+        )
+        Spacer(modifier = Modifier.size(10.dp))
+        //setting text bar and button for registration
+        Button(onClick = goBack){
+            Text("Register")
+        }
+        Button(onClick = goBack){
+            Text("Back")
+        }
+    }
+
+}
+@Composable
+fun RegisterScreen(goBack: () -> Unit) {
+    Text("REGISTER SCREEN")
+    Column ( //center and set size
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize().padding(30.dp)
+    ){
+        TextField(
+            value = email.value,
+            onValueChange = {email.value = it}
+        )
+        Spacer(modifier = Modifier.size(10.dp))
+        TextField(
+            value = password.value,
+            onValueChange = {password.value = it}
+        )
+        Spacer(modifier = Modifier.size(10.dp))
+        //setting text bar and button for registration
+        Button(onClick = goBack){
+            Text("Register")
+        }
+        Button(onClick = goBack){
+            Text("Back")
+        }
+    }
+}
 @Composable
 fun HomeScreen(){
     var selectedItem by remember { mutableStateOf(0) } //with no logic yet
@@ -93,6 +202,11 @@ fun emergButton(){ //a dialer will appear upon click (for now)
 fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int)-> Unit){ //with selected index for items for now
     NavigationBar {
         NavigationBarItem(
+            selected = selectedIndex == 2, onClick = { onItemSelected(2) },
+            icon = { Icon(Icons.Default.ShareLocation, contentDescription = "Location")},
+            label = { Text("Location") }
+        )
+        NavigationBarItem(
             selected = selectedIndex == 0, onClick = { onItemSelected(0) },
             icon = { Icon(Icons.Default.Home, contentDescription = "Home")},
             label = { Text("Home") }
@@ -102,5 +216,7 @@ fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int)-> Unit){ //with selec
             icon = { Icon(Icons.Default.Settings, contentDescription = "Settings")},
             label = { Text("Settings") }
         )
+
     }//Navigation bar contents
-}
+}//bottomNavBAr
+
