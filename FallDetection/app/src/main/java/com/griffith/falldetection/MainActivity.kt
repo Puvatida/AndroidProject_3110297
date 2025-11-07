@@ -1,6 +1,8 @@
 package com.griffith.falldetection
 
 
+import android.R.attr.onClick
+import android.R.attr.password
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -29,31 +31,43 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.room.Room
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        enableEdgeToEdge()
+        //creating instance of the database
+        val db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "UserDatabase"//database name
+        ).build()
+        //use abstract method from AppDatabase to get instances of DAO, to interact with database
+        val userDao = db.UserDao()
+//        val user: List<User> = userDao.getAll()
+
         setContent {
             Text("Set up")
-            StartScreen()
-//            Login()
-//            HomeScreen()
+            StartScreen(userDao)
             }
         }//set content
     }
-private var email = mutableStateOf("enter email")
-private var password = mutableStateOf("enter password")
+////variables for email and password
+//private var email = mutableStateOf("enter email")
+//private var password = mutableStateOf("enter password")
 @Composable
-fun StartScreen(){
+fun StartScreen(userDao: UserDao){
     //create a mutable value to track which screen to show based on user's click
     var view by remember { mutableStateOf("start") }
 
@@ -63,8 +77,12 @@ fun StartScreen(){
             loginClick = { view = "login" }
         )
         //directing user to welcome screen
-        "register" -> RegisterScreen(goBack = {view = "start"}) //to start if user wishes
-        "login" -> LoginScreen(goBack = {view = "start"})
+        "register" -> RegisterScreen(
+            userDao = userDao,
+            goBack = {view = "start"}) //to start if user wishes
+        "login" -> LoginScreen(
+            userDao = userDao,
+            goBack = {view = "start"})
     }
 }
 @Composable //with button parameters onClick()
@@ -87,7 +105,6 @@ fun WelcomeScreen(registerClick: () -> Unit, loginClick: () -> Unit) { //First s
         //welcome text
         Text(
             text = "Welcome"
-
         )
         Spacer(modifier = Modifier.size(40.dp))
         //ask user to login or register button
@@ -101,58 +118,112 @@ fun WelcomeScreen(registerClick: () -> Unit, loginClick: () -> Unit) { //First s
     }
 }//Welcome Screen
 @Composable
-fun LoginScreen(goBack: () -> Unit) {
-    Text("LOGIN SCREEN")
-    Column ( //center and set size
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(30.dp)
-    ){
-        TextField(
-            value = email.value,
-            onValueChange = {email.value = it}
-        )
-        Spacer(modifier = Modifier.size(10.dp))
-        TextField(
-            value = password.value,
-            onValueChange = {password.value = it}
-        )
-        Spacer(modifier = Modifier.size(10.dp))
-        //setting text bar and button for registration
-        Button(onClick = goBack){
-            Text("Register")
-        }
-        Button(onClick = goBack){
-            Text("Back")
-        }
-    }
+fun LoginScreen(goBack: () -> Unit, userDao: UserDao) {
+    //empty variables for email, password and message
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    //concurrency Kotlin use coroutines.
+    val coroutineScope = rememberCoroutineScope()
+    //if login is successful
+    var userLogin by remember{mutableStateOf(false)}
 
-}
+    if(userLogin){
+        //if user login we pull the home screen, replacing the login screen.
+        HomeScreen()
+    }
+    else {
+        Text("LOGIN SCREEN")
+        Column( //center and set size
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize().padding(30.dp)
+        ) {
+            TextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") }
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") }
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+            //setting text bar and button for registration
+            Button(
+                onClick = {
+                    coroutineScope.launch(Dispatchers.IO) {
+                        val user = userDao.login(email, password)
+                        if (user != null) {
+                            message = "You're Login"
+                            userLogin = true
+                        } else {
+                            message = "Invalid credentials"
+                        }
+                    }//coroutine
+                }//onClick
+            )//button
+            {
+                Text("Login")
+            }
+
+            Button(onClick = goBack) {
+                Text("Back")
+
+            }//back button
+            Text(message)
+        }
+    }//else
+}//loginScreen
 @Composable
-fun RegisterScreen(goBack: () -> Unit) {
+fun RegisterScreen(goBack: () -> Unit, userDao: UserDao) {
+    //empty variables for email, password and message
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    //concurrency Kotlin use coroutines.
+    val coroutineScope = rememberCoroutineScope()
+    //to validate the email and password
+    val isValidCredential = email.contains("@") && email.contains(".")
+    val notEmpty = email.isNotEmpty() && password.isNotEmpty()
+
     Text("REGISTER SCREEN")
     Column ( //center and set size
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize().padding(30.dp)
     ){
-        TextField(
-            value = email.value,
-            onValueChange = {email.value = it}
+        TextField( //text space for email
+            value = email,
+            onValueChange = {email = it},
+            label = {Text("Email")}
         )
         Spacer(modifier = Modifier.size(10.dp))
-        TextField(
-            value = password.value,
-            onValueChange = {password.value = it}
+        TextField(//text space for password
+            value = password,
+            onValueChange = {password = it},
+            label = {Text("Password")}
         )
         Spacer(modifier = Modifier.size(10.dp))
         //setting text bar and button for registration
-        Button(onClick = goBack){
+        Button(
+            //enable if field is not empty and email is valid
+            enabled = isValidCredential && notEmpty,
+            onClick = {
+            coroutineScope.launch(Dispatchers.IO){
+                userDao.register(User(email = email, password = password))
+                message = "You're registered, Please login."
+            }
+
+        }){
             Text("Register")
         }
         Button(onClick = goBack){
             Text("Back")
         }
+        Text(message)
     }
 }
 @Composable

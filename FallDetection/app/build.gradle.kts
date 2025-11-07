@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    //add plugin for ksp
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -42,6 +44,13 @@ android {
 }
 
 dependencies {
+
+    val room_version = "2.8.3"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+
     implementation("androidx.navigation:navigation-compose-android:2.9.5")//added
     implementation(platform("androidx.compose:compose-bom:2025.10.01"))
     implementation ("androidx.compose.material:material-icons-extended")
