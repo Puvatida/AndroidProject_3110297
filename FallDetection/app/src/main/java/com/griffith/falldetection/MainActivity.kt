@@ -28,6 +28,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,7 @@ import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
+/*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -229,6 +230,12 @@ fun RegisterScreen(goBack: () -> Unit, userDao: UserDao) {
 @Composable
 fun HomeScreen(){
     var selectedItem by remember { mutableStateOf(0) } //with no logic yet
+    val context = LocalContext.current
+    //start the fall detection immediately
+    LaunchedEffect(Unit) {
+        val intent = Intent(context, AccelerometerService::class.java)
+        context.startService(intent)
+    }
     //Scaffold
     Scaffold(
         bottomBar = {
