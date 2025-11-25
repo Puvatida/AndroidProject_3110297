@@ -44,7 +44,7 @@ class AccelerometerService : Service(), SensorEventListener {
         //first, always check if sensor is on device.
         if(sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!= null){
             //success
-            Log.d( "SensorServie","Accelerometer sensor found on this device.")
+            Log.d( "SensorService","Accelerometer sensor found on this device.")
         } else {
            Log.d("SensorService", "Error, no Accelerometer sensor found on this device.")
         }
