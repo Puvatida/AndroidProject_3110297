@@ -55,12 +55,11 @@ class AccelerometerService : Service(), SensorEventListener {
         Log.d("SensorService", " Accelerometer Service starts in background")
     }
     override fun onBind(p0: Intent?): IBinder? {
-        TODO("Not yet implemented")
        //not need
+        return null
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-        TODO("Not yet implemented")
         //not need; invokes ANY changes in accuracy VALUES of the sensor object
     }
 
