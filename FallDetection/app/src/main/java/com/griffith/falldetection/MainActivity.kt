@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -42,6 +44,7 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.jvm.java
 
 /*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
 class MainActivity : ComponentActivity() {
@@ -250,9 +253,11 @@ fun HomeScreen(){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
-        .padding(innerPadding),
+        .padding(innerPadding).padding(32.dp),
         ) {
         emergButton()//onClick button
+        Spacer(modifier = Modifier.size(10.dp))
+        simulatedFallButton()
     }
     }
 }//HomeScreen
@@ -298,3 +303,15 @@ fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int)-> Unit){ //with selec
     }//Navigation bar contents
 }//bottomNavBAr
 
+@Composable
+fun simulatedFallButton(){
+    val context = LocalContext.current
+    Button(onClick = {
+        val intent = Intent(context,AlertActivity::class.java) //using intent for alertAcitvity Scrren
+        context.startActivity(intent)
+                     },
+        modifier = Modifier.fillMaxWidth().padding(8.dp).height(55.dp)
+    ){
+            Text("Simulated Fall")
+        }//set width + height
+}

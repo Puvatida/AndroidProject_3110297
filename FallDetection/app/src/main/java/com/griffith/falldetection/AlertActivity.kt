@@ -52,7 +52,7 @@ fun AlertScreen(){
     val context = LocalContext.current
     //Timer for Emergency call (starts once alert popups)
     LaunchedEffect(Unit) {
-        object : CountDownTimer(20_00, 1000){//20 sec, updates every 1seconds
+        object : CountDownTimer(20_000, 1000){//20 sec, updates every 1seconds
             override fun onTick(msRemaining: Long){
                 countDownTime = (msRemaining / 1000).toInt()
             }
@@ -64,9 +64,14 @@ fun AlertScreen(){
 
     }
     //when timer finish, auto call
-    if(emergencyTime){
-        autoCall(context)
+    LaunchedEffect(emergencyTime) { //to use delay of 2seconds before launch
+        if(emergencyTime){
+            kotlinx.coroutines.delay(2000) //to slow things down
+            autoCall(context)
+        }
+
     }
+
     //UI - for user to press okay if it is a false alert.
     //add column to space out everything and add spacers
     Surface(
