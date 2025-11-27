@@ -26,6 +26,7 @@
         <service
             android:name=".AccelerometerService"
             android:exported="false"/>
+        <activity android:name=".AlertActivity"/>
     </application>
 
 </manifest>

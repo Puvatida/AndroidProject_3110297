@@ -70,7 +70,7 @@ class AccelerometerService : Service(), SensorEventListener {
         val y = event.values[1]
         val z = event.values[2]
         //calculate tota magnitude force with formula
-        val magnitude = sqrt(x*x+y*y+z*z)
+        val magnitude = sqrt(x*x + y*y + z*z)
         Log.d("SensorService","Magnitude:  $magnitude")
         //Detect the sudden impact of magnitude
         if(magnitude>fallRate && !fallDetected){
@@ -79,7 +79,7 @@ class AccelerometerService : Service(), SensorEventListener {
             Log.d("SensorService", "Impact has been detected!")
         }
         //Detect inactivity; then trigger first with activity alert and then in if else statement impact = false
-        if(fallDetected == true){
+        if(fallDetected){
             if (magnitude < inactivityTime){
                 val currentSecond = System.currentTimeMillis()
                 if (currentSecond - inactivityStartTime > inactiveDuratiuon ) {//so if it is 3 seconds +
