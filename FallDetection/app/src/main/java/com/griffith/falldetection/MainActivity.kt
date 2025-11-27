@@ -307,7 +307,7 @@ fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int)-> Unit){ //with selec
 fun simulatedFallButton(){
     val context = LocalContext.current
     Button(onClick = {
-        val intent = Intent(context,AlertActivity::class.java) //using intent for alertAcitvity Scrren
+        val intent = Intent(context, AccelerometerService::class.java) //using intent for alertAcitvity Scrren
         context.startActivity(intent)
                      },
         modifier = Modifier.fillMaxWidth().padding(8.dp).height(55.dp)

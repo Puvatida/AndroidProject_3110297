@@ -88,11 +88,11 @@ fun AlertScreen(){
         Text(
             text = "Fall Detect",
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = "Are you okay?",
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         //showing user timer
         Text(
             text = "calling emergency contact in $countDownTime seconds...",

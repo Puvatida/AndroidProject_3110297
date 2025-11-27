@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Text
+import androidx.core.os.postDelayed
 import kotlin.jvm.java
 import kotlin.math.sqrt
 
@@ -98,6 +99,32 @@ class AccelerometerService : Service(), SensorEventListener {
                 fallDetected = false
             }
         }
+    }
+//Accelerometer Service to recieve the fake fall method that is invoke in this onStartCommand method
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if(intent?.getBooleanExtra("simulateFall", false) == true){
+//            Log.d("SensorService", "")
+            simulateFall()
+        }
+        return START_STICKY
+    }
+    fun simulateFall() { //injecting a spike magnitude and inject 0 after to create fall simulation
+        val fakeSpike = 50f //will cause fall detection alert
+        inactivityStartTime = System.currentTimeMillis()
+        fallDetected = true
+        Log.d("SensorService", "Simulating Fall...")
+
+        android.os.Handler(mainLooper).postDelayed({
+            val fakeInactivity = 0f
+            val current = System.currentTimeMillis()
+            if (current - inactivityStartTime > inactiveDuratiuon) {
+                val intent =
+                    Intent(this, AlertActivity::class.java) //using intent for alertAcitvity Scrren
+                //service needs to addFlag to open normally,
+
+                startActivity(intent)
+            }
+        }, 500)
     }
 
 }
