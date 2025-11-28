@@ -247,20 +247,28 @@ fun HomeScreen(){
             }
         }
     ) { innerPadding ->
-        //main content
 
+        when(selectedItem){
+            0 -> HomeContent(innerPadding)
+            1 -> LocationScreen()
+            2 -> LocationScreen()
+        }
+        //main content
+    }
+}//HomeScreen
+@Composable
+fun HomeContent(innerPadding: androidx.compose.foundation.layout.PaddingValues){
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
-        .padding(innerPadding).padding(32.dp),
-        ) {
+            .padding(innerPadding).padding(32.dp),
+    ) {
         emergButton()//onClick button
         Spacer(modifier = Modifier.size(10.dp))
         simulatedFallButton()
     }
-    }
-}//HomeScreen
+}
 @Composable
 fun emergButton(){ //a dialer will appear upon click (for now)
     val activity = LocalContext.current
@@ -308,7 +316,9 @@ fun simulatedFallButton(){
     val context = LocalContext.current
     Button(onClick = {
         val intent = Intent(context, AccelerometerService::class.java) //using intent for alertAcitvity Scrren
-        context.startActivity(intent)
+        //set fall to true
+        intent.putExtra("simulateFall", true)
+        context.startService(intent)
                      },
         modifier = Modifier.fillMaxWidth().padding(8.dp).height(55.dp)
     ){

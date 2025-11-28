@@ -109,22 +109,24 @@ class AccelerometerService : Service(), SensorEventListener {
         return START_STICKY
     }
     fun simulateFall() { //injecting a spike magnitude and inject 0 after to create fall simulation
-        val fakeSpike = 50f //will cause fall detection alert
         inactivityStartTime = System.currentTimeMillis()
-        fallDetected = true
+        fallDetected = true // by pass accelerometer
         Log.d("SensorService", "Simulating Fall...")
 
+        //i want to simulate the fall after a 3.5 seconds
         android.os.Handler(mainLooper).postDelayed({
-            val fakeInactivity = 0f
             val current = System.currentTimeMillis()
+            //if (3500 - 0 > 3000)
             if (current - inactivityStartTime > inactiveDuratiuon) {
                 val intent =
                     Intent(this, AlertActivity::class.java) //using intent for alertAcitvity Scrren
                 //service needs to addFlag to open normally,
-
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)//launch activity
                 startActivity(intent)
+
+                fallDetected = false
             }
-        }, 500)
-    }
+        }, 3500) //3.5seconds wait/delay
+    }//3seconds of inactivity afer by pass fall detected spike and alert activity will show
 
 }
