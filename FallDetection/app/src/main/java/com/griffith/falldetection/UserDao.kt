@@ -25,4 +25,10 @@ interface UserDao {
 
     @Delete
     fun delete(user: User)
+
+    @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
+    fun getUserByEmail(email: String): User?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upDateUser(user: User)
 }

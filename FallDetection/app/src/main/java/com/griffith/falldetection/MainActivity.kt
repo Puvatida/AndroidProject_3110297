@@ -11,8 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -21,7 +20,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShareLocation
-//import androidx.activity.enableEdgeToEdge
+
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -41,9 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.jvm.java
 
 /*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
@@ -52,11 +53,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 //        enableEdgeToEdge()
         //creating instance of the database
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "UserDatabase"//database name
-        ).build()
+//        val db = Room.databaseBuilder(
+//            applicationContext,
+//            AppDatabase::class.java,
+//            "UserDatabase"//database name
+//        ).build()
+        //reconnecting database
+        val db = AppDatabase.getInstance(applicationContext)
         //use abstract method from AppDatabase to get instances of DAO, to interact with database
         val userDao = db.UserDao()
 //        val user: List<User> = userDao.getAll()
@@ -132,6 +135,9 @@ fun LoginScreen(goBack: () -> Unit, userDao: UserDao) {
     //if login is successful
     var userLogin by remember{mutableStateOf(false)}
 
+    //settings viewmodel to update the user info in
+    val settingsViewModel: SettingsViewModel = viewModel()
+
     if(userLogin){
         //if user login we pull the home screen, replacing the login screen.
         HomeScreen()
@@ -161,8 +167,14 @@ fun LoginScreen(goBack: () -> Unit, userDao: UserDao) {
                     coroutineScope.launch(Dispatchers.IO) {
                         val user = userDao.login(email, password)
                         if (user != null) {
-                            message = "You're Login"
-                            userLogin = true
+                            //when user sucessfully login
+                            //letSettingsViewModel know which user is in
+                            settingsViewModel.setLoggedInEmail(user.email)
+
+                            withContext((Dispatchers.Main)){
+                                message = "You're Login"
+                                userLogin = true
+                            }
                         } else {
                             message = "Invalid credentials"
                         }
@@ -266,7 +278,7 @@ fun HomeContent(innerPadding: androidx.compose.foundation.layout.PaddingValues){
     ) {
         emergButton()//onClick button
         Spacer(modifier = Modifier.size(10.dp))
-        simulatedFallButton()
+//        simulatedFallButton() //moved to settingsScreen
     }
 }
 @Composable
