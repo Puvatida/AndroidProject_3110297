@@ -64,9 +64,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             Text("Set up")
             StartScreen(userDao)
-            }
         }//set content
     }
+}
 ////variables for email and password
 //private var email = mutableStateOf("enter email")
 //private var password = mutableStateOf("enter password")
@@ -250,7 +250,7 @@ fun HomeScreen(){
 
         when(selectedItem){
             0 -> HomeContent(innerPadding)
-            1 -> LocationScreen()
+            1 -> SettingsScreen()
             2 -> LocationScreen()
         }
         //main content
@@ -311,17 +311,4 @@ fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int)-> Unit){ //with selec
     }//Navigation bar contents
 }//bottomNavBAr
 
-@Composable
-fun simulatedFallButton(){
-    val context = LocalContext.current
-    Button(onClick = {
-        val intent = Intent(context, AccelerometerService::class.java) //using intent for alertAcitvity Scrren
-        //set fall to true
-        intent.putExtra("simulateFall", true)
-        context.startService(intent)
-                     },
-        modifier = Modifier.fillMaxWidth().padding(8.dp).height(55.dp)
-    ){
-            Text("Simulated Fall")
-        }//set width + height
-}
+

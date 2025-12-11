@@ -12,10 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import android.Manifest
 import android.content.pm.PackageManager
-import android.util.Log.e
-import android.util.Log.i
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,48 +24,78 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.tasks.await
-import kotlin.contracts.contract
-
-
+import kotlinx.coroutines.delay
 @Composable
 fun LocationScreen(){
     //get user location
     val context = LocalContext.current
-    var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var userLocation by remember { mutableStateOf<LatLng?>(LatLng(53.3498, -6.2603)) }
     var errMsg by remember { mutableStateOf<String?>(null) }
 
     val lastLocation = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
+
+
+    var permission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
     //location request permission else -> request wound not be granted
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = {
-            granted ->
+                granted ->
+            permission = granted
             if(!granted){
                 errMsg = "Denied Permission"
             }
         }
     )
 
-    val permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED
 
-    //Request Permissoin
+    //Request Permission
     LaunchedEffect(Unit) {
+        delay(300)
         if(!permission){
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    //fetch locaton
+    //fetch location
+//    LaunchedEffect(permission) {
+//        if(permission) { //if there is permission granted
+//            try {
+//                val canceltokenSrc = CancellationTokenSource()
+////                val location = lastLocation.lastLocation.await()
+//                val location = lastLocation.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, canceltokenSrc.token)
+//                if (location != null) {
+//                    userLocation = LatLng(location.latitude, location.longitude)
+//                } else {
+//                    errMsg = "Location could not be fetched"
+//                }//else
+//            } catch (e: Exception) {
+//                errMsg = "Error: ${e.message}"
+//            }
+//        }
+//        else{
+//            errMsg = "Permission for location is not granted"
+//        }
+//        }
     LaunchedEffect(permission) {
         if(permission) { //if there is permission granted
             try {
-                val location = lastLocation.lastLocation.await()
+                val canceltokenSrc = CancellationTokenSource()
+//                val location = lastLocation.lastLocation.await()
+                val location = lastLocation.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, canceltokenSrc.token).await()
+
                 if (location != null) {
                     userLocation = LatLng(location.latitude, location.longitude)
                 } else {
@@ -81,7 +108,7 @@ fun LocationScreen(){
         else{
             errMsg = "Permission for location is not granted"
         }
-        }
+    }
 
     //UI section of screen
     Column (
