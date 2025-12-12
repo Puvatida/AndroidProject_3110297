@@ -19,8 +19,11 @@ class SettingsViewModel (application: Application) : AndroidViewModel(applicatio
 
     private val userDao = AppDatabase.getInstance(application).UserDao()
 
-    //current user
+    //current user and app states
     var currentEmail: String? = null
+        private set
+
+    var isEditing by mutableStateOf(false)
         private set
     //set user settings
     var fullName by mutableStateOf("")
@@ -41,7 +44,7 @@ class SettingsViewModel (application: Application) : AndroidViewModel(applicatio
 //    var darkModeEnabled by mutableStateOf(true)
 //        private set
 
-
+    //after USER login
     fun setLoggedInEmail(email: String){
         currentEmail = email //let the login email to equal this var
 
@@ -59,25 +62,31 @@ class SettingsViewModel (application: Application) : AndroidViewModel(applicatio
         }
     }//setLoggedInEmail
 
+    fun editing(){
+        isEditing = true
+    }
+    fun saveChanges(){
+        saveUserToDataBase()
+        isEditing = false //set back to false
+    }
 
-    //after USER login
 
     //functions for the update
     fun updateFullName(value: String){
         fullName = value
-        saveUserToDataBase()
+//        saveUserToDataBase()
     }
     fun updateAge(value: String){
         age = value
-        saveUserToDataBase()
+//        saveUserToDataBase()
     }
     fun updateEmergencyName(value: String){
         emergencyName = value
-        saveUserToDataBase()
+//        saveUserToDataBase()
     }
     fun updateEmergencyNumber(value: String){
         emergencyNumber = value
-        saveUserToDataBase()
+//        saveUserToDataBase()
     }
 //    fun setLocationEnabled(enabled: Boolean){
 //        locationEnabled = enabled

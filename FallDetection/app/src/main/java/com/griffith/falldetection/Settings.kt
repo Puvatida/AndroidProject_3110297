@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.ui.text.font.FontWeight
 //import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,10 +37,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 
+import java.lang.Compiler.enable
+
+
 //@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
+fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel(), onLogout: () -> Unit){
 
+    val scrollState = rememberScrollState()
     //from view model
     val fullName = settingsViewModel.fullName
     val age = settingsViewModel.age
@@ -48,6 +53,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
 //    val locationEnabled = settingsViewModel.locationEnabled
 //    val notificationEnabled = settingsViewModel.notificationsEnabled
 //    val darkModeEnabled = settingsViewModel.darkModeEnabled
+    val  editing = settingsViewModel.isEditing
+    var logout by remember {mutableStateOf(false)}
 
     //UI
     Column (
@@ -63,10 +70,12 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
 
         Spacer(modifier = Modifier.size(10.dp))//spacer
 
+
+
         //add scrollable content
         Column(
             modifier = Modifier
-                .weight(1f).verticalScroll(rememberScrollState())
+                .weight(1f).verticalScroll(scrollState)
         ){
             //Card layout
             Card(
@@ -90,7 +99,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
                         value = fullName,
                         onValueChange = { settingsViewModel.updateFullName(it)}, //set from viewModel function
                         label = {Text("Full name")},
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+//                        enable = editing
                     )
                     Spacer(modifier = Modifier.size(8.dp))
 
@@ -98,7 +108,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
                         value = age,
                         onValueChange = { settingsViewModel.updateAge(it)}, //set w/viewModel function
                         label = {Text("Age ")},
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = editing
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                 }
@@ -127,7 +138,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
                         value = emergencyName,
                         onValueChange = { settingsViewModel.updateEmergencyName(it)},
                         label = {Text("Contact Name ")},
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = editing
                     )
                     Spacer(modifier = Modifier.size(8.dp))
 
@@ -135,7 +147,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
                         value = emergencyNumber,
                         onValueChange = { settingsViewModel.updateEmergencyNumber(it)},
                         label = {Text("Phone Number ")},
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = editing
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                 }
@@ -164,7 +177,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
                         text = "Press the button for testing"
                     )
                     Spacer(modifier = Modifier.size(8.dp))
-                    simulatedFallButton()
+                    simulatedFallButton(editing = editing)
+
                 }
 
             }//CARD: Fall Detection button
@@ -233,7 +247,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
 //
 //            }//CARD: Permissions
 // ---------------------------------------
-            //Card layout
+//            //Card layout
 //            Card(
 //                modifier = Modifier.fillMaxSize()
 //                    .padding(vertical = 8.dp),
@@ -266,7 +280,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
 //                            }
 //                            Switch(
 //                                checked = darkModeEnabled,
-//                                onCheckedChange = { settingsViewModel.setDarkModeEnabled(it)}
+//                                onCheckedChange = { settingsViewModel.darkModeEnabled}
 //                            )
 //                    }
 //                    Spacer(modifier = Modifier.size(8.dp))
@@ -274,13 +288,63 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel()){
 //
 //            }//CARD: App Settings
 
+            Button( //app for editing, everything will be disabled before
+                onClick = {
+                    if (editing){
+                        //save
+                        settingsViewModel.saveChanges()
+                    }
+                    else {
+                        //edit
+                        settingsViewModel.editing()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(if (editing) "Save" else "Edit")
+            }
+
+            Button(//button to logout and bring user back to startScreen()
+                onClick = {logout = true},
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
+            }
+            if (logout){ //logout dialog to ask user
+                AlertDialog(
+                    onDismissRequest =  { logout = false },
+                    title = { Text("Logout?") },
+                    text = { Text("Are you sure?") },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                logout = false
+                                onLogout()
+                            }
+                        ) {
+                            Text("Yes")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                logout = false
+                            }
+                        ) {
+                            Text("No")
+                        }
+                    },
+                )
+            }//if for logout dialog button
+
         }//Scrollable
+
     }//1stUI column
 
 }//settingsScreen()
 
 @Composable
-fun simulatedFallButton(){
+fun simulatedFallButton(editing: Boolean){
     val context = LocalContext.current
     Button(onClick = {
         val intent = Intent(context, AccelerometerService::class.java) //using intent for alertAcitvity Scrren
@@ -288,6 +352,7 @@ fun simulatedFallButton(){
         intent.putExtra("simulateFall", true)
         context.startService(intent)
     },
+        enabled = !editing,
         modifier = Modifier.fillMaxWidth().padding(8.dp).height(55.dp)
     ){
         Text("Simulated Fall")

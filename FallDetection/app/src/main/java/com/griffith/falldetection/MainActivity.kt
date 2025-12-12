@@ -8,7 +8,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 
@@ -65,7 +67,6 @@ class MainActivity : ComponentActivity() {
 //        val user: List<User> = userDao.getAll()
 
         setContent {
-            Text("Set up")
             StartScreen(userDao)
         }//set content
     }
@@ -89,7 +90,11 @@ fun StartScreen(userDao: UserDao){
             goBack = {view = "start"}) //to start if user wishes
         "login" -> LoginScreen(
             userDao = userDao,
-            goBack = {view = "start"})
+            goBack = {view = "start"},
+            onLoginSuccess = {view = "home"})
+        "home" -> HomeScreen(
+            onLogout = {view = "start"}
+        )
     }
 }
 @Composable //with button parameters onClick()
@@ -125,7 +130,7 @@ fun WelcomeScreen(registerClick: () -> Unit, loginClick: () -> Unit) { //First s
     }
 }//Welcome Screen
 @Composable
-fun LoginScreen(goBack: () -> Unit, userDao: UserDao) {
+fun LoginScreen(goBack: () -> Unit, userDao: UserDao, onLoginSuccess: () -> Unit) {
     //empty variables for email, password and message
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -133,17 +138,15 @@ fun LoginScreen(goBack: () -> Unit, userDao: UserDao) {
     //concurrency Kotlin use coroutines.
     val coroutineScope = rememberCoroutineScope()
     //if login is successful
-    var userLogin by remember{mutableStateOf(false)}
-
+//    var userLogin by remember{mutableStateOf(false)} //dont need anymore
     //settings viewmodel to update the user info in
     val settingsViewModel: SettingsViewModel = viewModel()
 
-    if(userLogin){
-        //if user login we pull the home screen, replacing the login screen.
-        HomeScreen()
-    }
-    else {
-        Text("LOGIN SCREEN")
+//    if(userLogin){
+//        //if user login we pull the home screen, replacing the login screen.
+//        HomeScreen()
+//    }
+//    else {
         Column( //center and set size
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -173,7 +176,8 @@ fun LoginScreen(goBack: () -> Unit, userDao: UserDao) {
 
                             withContext((Dispatchers.Main)){
                                 message = "You're Login"
-                                userLogin = true
+//                                userLogin = true
+                                onLoginSuccess()
                             }
                         } else {
                             message = "Invalid credentials"
@@ -190,7 +194,7 @@ fun LoginScreen(goBack: () -> Unit, userDao: UserDao) {
 
             }//back button
             Text(message)
-        }
+//        }
     }//else
 }//loginScreen
 @Composable
@@ -243,7 +247,7 @@ fun RegisterScreen(goBack: () -> Unit, userDao: UserDao) {
     }
 }
 @Composable
-fun HomeScreen(){
+fun HomeScreen(onLogout: () -> Unit){
     var selectedItem by remember { mutableStateOf(0) } //with no logic yet
     val context = LocalContext.current
     //start the fall detection immediately
@@ -262,14 +266,16 @@ fun HomeScreen(){
 
         when(selectedItem){
             0 -> HomeContent(innerPadding)
-            1 -> SettingsScreen()
+            1 -> Box(modifier = Modifier.padding(innerPadding)){
+                SettingsScreen(onLogout = onLogout)
+            }
             2 -> LocationScreen()
         }
         //main content
     }
 }//HomeScreen
 @Composable
-fun HomeContent(innerPadding: androidx.compose.foundation.layout.PaddingValues){
+fun HomeContent(innerPadding: PaddingValues){
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
