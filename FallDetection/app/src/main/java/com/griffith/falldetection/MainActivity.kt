@@ -290,13 +290,23 @@ fun HomeContent(innerPadding: PaddingValues){
 @Composable
 fun emergButton(){ //a dialer will appear upon click (for now)
     val activity = LocalContext.current
+    //calling viewModel that deals with user info data
+    val settingsViewModel: SettingsViewModel = viewModel()
+    //calling emergency number that user set in settings
+    val emergencyNumber = settingsViewModel.emergencyNumber
+
+    //removing the hard code "123" number and insert the stored emergency number instead
     Button(onClick = {
-        val num = "123"
-        val intent = Intent(Intent.ACTION_DIAL) //using intent for phone call
-        intent.data = "tel:$num".toUri()
-        if (activity != null) {
-            activity.startActivity(intent)
+//        val num = "123"
+        val emergencyNum = if (emergencyNumber.isNotBlank()){
+            emergencyNumber //user input number
         }
+        else {
+            //pop up message
+        }
+        //the user input number
+        val intent = Intent(Intent.ACTION_DIAL, "tel: $emergencyNum".toUri()) //using intent for phone call
+        activity.startActivity(intent)//start intent
     },
         modifier = Modifier.size(150.dp), //set width + height
         shape = CircleShape //circle shaped button
