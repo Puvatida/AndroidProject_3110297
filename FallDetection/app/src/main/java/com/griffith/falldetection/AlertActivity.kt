@@ -1,8 +1,7 @@
 package com.griffith.falldetection
 
-import android.R.attr.onClick
+import android.R.attr.dial
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,20 +30,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.tasks.Tasks.call
+import java.lang.ProcessBuilder.Redirect.to
 
 
 class AlertActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val emergencyNumber = intent.getStringExtra("emergencyNumber") ?: "999"
         setContent {
-            Text("Alert Activity Page")
-            AlertScreen()
+//            Text("Alert Activity Page")
+            AlertScreen(emergencyNumber = emergencyNumber)
         }//setContent
     }//onCreate
 }//class
 //Alert Screen pop-up Method to be involve when Fall Detected
 @Composable
-fun AlertScreen(){
+fun AlertScreen(emergencyNumber: String) {
     //set variables
     var countDownTime by remember { mutableStateOf(20) }//give user 10 seconds to react / interact with screen
     var emergencyTime by remember { mutableStateOf(false) }
@@ -67,7 +69,7 @@ fun AlertScreen(){
     LaunchedEffect(emergencyTime) { //to use delay of 2seconds before launch
         if(emergencyTime){
             kotlinx.coroutines.delay(2000) //to slow things down
-            autoCall(context)
+            autoCall(context, emergencyNumber)
         }
 
     }
@@ -110,7 +112,7 @@ fun AlertScreen(){
         //I'm not okay -> alert call
 //        Spacer(modifier = Modifier.size(10.dp))
         Button(onClick = {
-            autoCall(context)
+            autoCall(context, emergencyNumber)
         },
             modifier = Modifier.fillMaxWidth().padding(8.dp).height(55.dp)
         ) {
@@ -120,11 +122,11 @@ fun AlertScreen(){
     }
 }
 //Function for emergency call
-fun autoCall(context: android.content.Context){ //same dial intent used in homescreen emergency call button.
-    val emergencyNum = "456"//456 for now
-    //using intent to make call by dial action
+fun autoCall(context: android.content.Context, emergencyNumber: String){ //same dial intent used in homescreen emergency call button.
+//    val emergencyNum = "456"//456 for now
+//    using intent to make call by dial action
     val intent = Intent(Intent.ACTION_DIAL)
-    intent.data = Uri.parse("tel:$emergencyNum")
+    intent.data = Uri.parse("tel:$emergencyNumber")
     context.startActivity(intent)
 
     Log.d("AlertActivity", "Timer over, calling emergency contact..")

@@ -2,6 +2,7 @@ package com.griffith.falldetection
 
 import android.R.attr.label
 import android.content.Intent
+import android.telephony.emergency.EmergencyNumber
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 import java.lang.Compiler.enable
+import kotlin.jvm.java
 
 
 //@OptIn(ExperimentalMaterial3Api::class)
@@ -177,7 +179,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel(), onLogout:
                         text = "Press the button for testing"
                     )
                     Spacer(modifier = Modifier.size(8.dp))
-                    simulatedFallButton(editing = editing)
+                    simulatedFallButton(editing = editing, emergencyNumber = emergencyNumber)
 
                 }
 
@@ -344,15 +346,18 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel(), onLogout:
 }//settingsScreen()
 
 @Composable
-fun simulatedFallButton(editing: Boolean){
+fun simulatedFallButton(editing: Boolean, emergencyNumber: String){
     val context = LocalContext.current
     Button(onClick = {
-        val intent = Intent(context, AccelerometerService::class.java) //using intent for alertAcitvity Scrren
-        //set fall to true
-        intent.putExtra("simulateFall", true)
+        val intent = Intent(context, AccelerometerService::class.java)
+            //input the user emergency contact from settings
+        intent.putExtra("simulateFall", true) //setting correct key word to call the service
+        intent.putExtra("emergencyNumber", emergencyNumber) //saved number
+         //using intent for alertAcitvity Screen
         context.startService(intent)
     },
-        enabled = !editing,
+        //do not want user to be able to make a call while editing the settings page.
+        enabled = !editing, //enable and disable when editing the settings page
         modifier = Modifier.fillMaxWidth().padding(8.dp).height(55.dp)
     ){
         Text("Simulated Fall")

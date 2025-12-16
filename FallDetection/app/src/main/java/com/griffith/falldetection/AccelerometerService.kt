@@ -18,6 +18,7 @@ class AccelerometerService : Service(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
     //var for detecting impact: define the spike force for possible fall
+    private var emergencyNumber: String = "1234" //default emergency num if not provided by user
 
     //var for inactivity: create the threshold,start time and duration time of inactivity before alert is triggered
     //a spike in magnitude that pay indicate a possible fall to look out for
@@ -86,7 +87,9 @@ class AccelerometerService : Service(), SensorEventListener {
                 if (currentSecond - inactivityStartTime > inactiveDuratiuon ) {//so if it is 3 seconds +
                     Log.d("SensorService", "fall Detected")
                     //launch the alert notification screen when the magnitude have been confirms and the pause has occurred more than 3 seconds
-                    val intent = Intent(this, AlertActivity::class.java)
+                    val intent = Intent(this, AlertActivity::class.java).apply {
+                        putExtra("emergencyNumber", emergencyNumber)
+                    }
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)//alert to this intent page
                     startActivity(intent)//initiate
 
@@ -102,6 +105,8 @@ class AccelerometerService : Service(), SensorEventListener {
     }
 //Accelerometer Service to recieve the fake fall method that is invoke in this onStartCommand method
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        //read emergency from intent that user provide
+        emergencyNumber = intent?.getStringExtra("emergencyNumber") ?: emergencyNumber
         if(intent?.getBooleanExtra("simulateFall", false) == true){
 //            Log.d("SensorService", "")
             simulateFall()
@@ -119,9 +124,12 @@ class AccelerometerService : Service(), SensorEventListener {
             //if (3500 - 0 > 3000)
             if (current - inactivityStartTime > inactiveDuratiuon) {
                 val intent =
-                    Intent(this, AlertActivity::class.java) //using intent for alertAcitvity Scrren
+                    Intent(this, AlertActivity::class.java).apply {
+                        putExtra("emergencyNumber", emergencyNumber)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }//using intent for alertAcitvity Scrren
                 //service needs to addFlag to open normally,
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)//launch activity
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)//launch activity
                 startActivity(intent)
 
                 fallDetected = false
