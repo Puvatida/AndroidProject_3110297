@@ -5,6 +5,7 @@ import android.R.attr.onClick
 import android.R.attr.password
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.ShareLocation
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -48,6 +51,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.jvm.java
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 /*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
 class MainActivity : ComponentActivity() {
@@ -141,6 +147,10 @@ fun LoginScreen(goBack: () -> Unit, userDao: UserDao, onLoginSuccess: () -> Unit
 //    var userLogin by remember{mutableStateOf(false)} //dont need anymore
     //settings viewmodel to update the user info in
     val settingsViewModel: SettingsViewModel = viewModel()
+//validations logic
+    val validEmail = Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val notEmpty = email.isNotEmpty() && password.isNotEmpty()
+    val validLogin = validEmail && notEmpty
 
 //    if(userLogin){
 //        //if user login we pull the home screen, replacing the login screen.
@@ -154,14 +164,22 @@ fun LoginScreen(goBack: () -> Unit, userDao: UserDao, onLoginSuccess: () -> Unit
         ) {
             TextField(
                 value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") }
+                onValueChange = { email = it .trim()},
+                label = { Text("Email") },
+                isError = email.isNotEmpty() && !validEmail
             )
+            if (email.isNotEmpty() && !validEmail) {
+                Text(
+                    text = "Enter a valid email",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
             Spacer(modifier = Modifier.size(10.dp))
             TextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") }
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
             )
             Spacer(modifier = Modifier.size(10.dp))
             //setting text bar and button for registration
@@ -205,32 +223,55 @@ fun RegisterScreen(goBack: () -> Unit, userDao: UserDao) {
     var message by remember { mutableStateOf("") }
     //concurrency Kotlin use coroutines.
     val coroutineScope = rememberCoroutineScope()
-    //to validate the email and password
-    val isValidCredential = email.contains("@") && email.contains(".")
+    //to validate the email and password logic
+    val validEmail = Patterns.EMAIL_ADDRESS.matcher(email).matches() //built in email pattern
+    val validPasswordLength = password.length >=8 //must be bigger or equal to 8
+    val containsDigits = password.any { it.isDigit() } //must contains digits
     val notEmpty = email.isNotEmpty() && password.isNotEmpty()
+    val validPassword = validPasswordLength && containsDigits
+
+    val validCredential = validEmail && validPassword && notEmpty
 
     Text("REGISTER SCREEN")
     Column ( //center and set size
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize().padding(30.dp)
-    ){
+    ) {
         TextField( //text space for email
             value = email,
-            onValueChange = {email = it},
-            label = {Text("Email")}
+            onValueChange = { email = it.trim() },
+            label = { Text("Email") },
+            isError = email.isNotEmpty() && !validEmail//invalid email in text not empty
         )
+
+        if (email.isNotEmpty() && !validEmail) {
+            Text(
+                text = "Enter valid email",
+                color = MaterialTheme.colorScheme.error
+            )
+        }
         Spacer(modifier = Modifier.size(10.dp))
         TextField(//text space for password
             value = password,
             onValueChange = {password = it},
-            label = {Text("Password")}
+            label =  {Text("Password")},
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+
         )
+        //password valid section
+        if(password.isNotEmpty() && !containsDigits){
+            Text(
+                text = "password must be 8 charecter long and contains a digit" ,
+                        color = MaterialTheme.colorScheme.error
+            )
+        }
         Spacer(modifier = Modifier.size(10.dp))
         //setting text bar and button for registration
         Button(
             //enable if field is not empty and email is valid
-            enabled = isValidCredential && notEmpty,
+            enabled = validCredential,
             onClick = {
             coroutineScope.launch(Dispatchers.IO){
                 userDao.register(User(email = email, password = password))
@@ -302,7 +343,7 @@ fun emergButton(){ //a dialer will appear upon click (for now)
             emergencyNumber //user input number
         }
         else {
-            //pop up message
+            "112" //irish emergency number
         }
         //the user input number
         val intent = Intent(Intent.ACTION_DIAL, "tel: $emergencyNum".toUri()) //using intent for phone call
