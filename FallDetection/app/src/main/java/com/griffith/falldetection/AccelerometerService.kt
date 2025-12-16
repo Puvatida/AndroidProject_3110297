@@ -8,11 +8,11 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.IBinder
 import android.util.Log
-import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
-import androidx.core.os.postDelayed
+
 import kotlin.jvm.java
 import kotlin.math.sqrt
+/*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
+/*Puvatida Simcharoen 3110297*/
 
 class AccelerometerService : Service(), SensorEventListener {
     private lateinit var sensorManager: SensorManager

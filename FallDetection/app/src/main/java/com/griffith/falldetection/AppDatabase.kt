@@ -1,8 +1,6 @@
 package com.griffith.falldetection
 
-import android.R.attr.version
 import android.content.Context
-import androidx.compose.runtime.IntState
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase

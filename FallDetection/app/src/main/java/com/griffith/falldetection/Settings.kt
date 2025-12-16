@@ -1,10 +1,7 @@
 package com.griffith.falldetection
 
-import android.R.attr.label
 import android.content.Intent
-import android.telephony.emergency.EmergencyNumber
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,28 +17,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-
-
-import java.lang.Compiler.enable
 import kotlin.jvm.java
 
-
+/*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
+/*Puvatida Simcharoen 3110297*/
 //@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel = viewModel(), onLogout: () -> Unit){

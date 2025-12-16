@@ -31,6 +31,8 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.delay
+/*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
+/*Puvatida Simcharoen 3110297*/
 @Composable
 fun LocationScreen(){
     //get user location

@@ -1,8 +1,5 @@
 package com.griffith.falldetection
 
-
-import android.R.attr.onClick
-import android.R.attr.password
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
@@ -46,16 +43,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Room
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.jvm.java
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 /*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
+/*Puvatida Simcharoen 3110297*/
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -232,7 +229,6 @@ fun RegisterScreen(goBack: () -> Unit, userDao: UserDao) {
 
     val validCredential = validEmail && validPassword && notEmpty
 
-    Text("REGISTER SCREEN")
     Column ( //center and set size
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

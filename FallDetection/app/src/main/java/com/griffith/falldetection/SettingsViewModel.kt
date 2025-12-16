@@ -1,19 +1,16 @@
 package com.griffith.falldetection
 
-import android.R.attr.enabled
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
+/*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
+/*Puvatida Simcharoen 3110297*/
 //this class is to hold settings in memory and settingsScreen reads from this via uiSate and update functions
 class SettingsViewModel (application: Application) : AndroidViewModel(application){
 
@@ -35,14 +32,6 @@ class SettingsViewModel (application: Application) : AndroidViewModel(applicatio
         private set
     var emergencyNumber by mutableStateOf("")
         private set
-
-    //settings relating to the app
-//    var locationEnabled by mutableStateOf(true)
-//        private set
-//    var notificationsEnabled by mutableStateOf(true)
-//        private set
-//    var darkModeEnabled by mutableStateOf(true)
-//        private set
 
     //after USER login
     fun setLoggedInEmail(email: String){

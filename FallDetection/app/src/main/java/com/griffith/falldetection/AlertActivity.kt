@@ -1,6 +1,5 @@
 package com.griffith.falldetection
 
-import android.R.attr.dial
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -30,8 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.tasks.Tasks.call
-import java.lang.ProcessBuilder.Redirect.to
+/*GitHub Link: https://github.com/Puvatida/AndroidProject_3110297*/
+/*Puvatida Simcharoen 3110297*/
 
 
 class AlertActivity : ComponentActivity(){
